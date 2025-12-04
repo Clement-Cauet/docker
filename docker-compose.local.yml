@@ -15,6 +15,7 @@ volumes:
   grafana-data:
   portainer-data:
   uptime-kuma-data:
+  teepee-proxy-data:
 
 services:
   # ============================================
@@ -333,3 +334,29 @@ services:
           memory: 200M
         reservations:
           memory: 64M
+
+  # ============================================
+  # TEEPEE PROXY
+  # ============================================
+  teepee-proxy:
+    image: alpine:latest
+    container_name: teepee-proxy
+    restart: unless-stopped
+    networks:
+      - web
+    command: sleep infinity
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.teepee-proxy.rule=Host(`${TEEPEE_PROXY_HOST}`)"
+      - "traefik.http.routers.teepee-proxy.entrypoints=web"
+      - "traefik.http.routers.teepee-proxy.middlewares=teepee-headers"
+      - "traefik.http.services.teepee-proxy-service.loadbalancer.server.url=${TEEPEE_HOST}"
+      - "traefik.http.services.teepee-proxy-service.loadbalancer.passhostheader=false"
+      - "traefik.http.middlewares.teepee-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.teepee-headers.headers.customresponseheaders.X-Proxied-By=Traefik"
+    deploy:
+      resources:
+        limits:
+          memory: 16M
+        reservations:
+          memory: 8M
