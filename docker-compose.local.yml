@@ -21,7 +21,7 @@ services:
   # REVERSE PROXY
   # ============================================
   traefik:
-    image: traefik:v3.2
+    image: traefik:latest
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -40,7 +40,7 @@ services:
       - TZ=Europe/Paris
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(${TRAEFIK_HOST})"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH}"
@@ -149,7 +149,7 @@ services:
       - N8N_PROTOCOL=http
       - N8N_PORT=${N8N_PORT}
       - NODE_ENV=production
-      - WEBHOOK_URL=https://${N8N_HOST}/n8n/
+      - WEBHOOK_URL=https://${N8N_HOST}/
       - GENERIC_TIMEZONE=Europe/Paris
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=${POSTGRES_HOST}
@@ -158,12 +158,11 @@ services:
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       - N8N_METRICS=true
-      - N8N_PATH=/n8n/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.n8n.rule=Host(${N8N_HOST})"
+      - "traefik.http.routers.n8n.rule=Host(`${N8N_HOST}`)"
       - "traefik.http.routers.n8n.entrypoints=web"
-      - "traefik.http.routers.n8n.middlewares=n8n-stripprefix"
+      - "traefik.http.services.n8n.loadbalancer.server.port=${N8N_PORT}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -195,11 +194,9 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.external-url=http://${PROMETHEUS_HOST}/prometheus/'
-      - '--web.route-prefix=/'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(${PROMETHEUS_HOST})"
+      - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_HOST}`)"
       - "traefik.http.routers.prometheus.entrypoints=web"
       - "traefik.http.services.prometheus.loadbalancer.server.port=${PROMETHEUS_PORT}"
     deploy:
@@ -260,7 +257,7 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
-      - GF_SERVER_ROOT_URL=http://${GRAFANA_HOST}/grafana/
+      - GF_SERVER_ROOT_URL=http://${GRAFANA_HOST}
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
       - GF_DATABASE_TYPE=postgres
@@ -273,7 +270,7 @@ services:
       - GF_INSTALL_PLUGINS=redis-datasource
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(${GRAFANA_HOST})"
+      - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST}`)"
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}"
     depends_on:
@@ -301,11 +298,9 @@ services:
       - uptime-kuma-data:/app/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.uptime.rule=Host(${UPTIME_HOST})"
+      - "traefik.http.routers.uptime.rule=Host(`${UPTIME_HOST}`)"
       - "traefik.http.routers.uptime.entrypoints=web"
       - "traefik.http.services.uptime.loadbalancer.server.port=${UPTIME_PORT}"
-      - "traefik.http.routers.uptime-kuma.entrypoints=web"
-      - "traefik.http.services.uptime-kuma.loadbalancer.server.port=${UPTIME_PORT}"
     deploy:
       resources:
         limits:
@@ -329,7 +324,7 @@ services:
       - portainer-data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(${PORTAINER_HOST})"
+      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST}`)"
       - "traefik.http.routers.portainer.entrypoints=web"
       - "traefik.http.services.portainer.loadbalancer.server.port=${PORTAINER_PORT}"
     deploy:

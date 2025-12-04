@@ -11,7 +11,6 @@ volumes:
   postgres-data:
   n8n-data:
   redis-data:
-  elasticsearch-data:
   prometheus-data:
   grafana-data:
   portainer-data:
@@ -22,7 +21,7 @@ services:
   # REVERSE PROXY
   # ============================================
   traefik:
-    image: traefik:v2.10
+    image: traefik:latest
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -41,7 +40,7 @@ services:
       - TZ=Europe/Paris
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(${TRAEFIK_HOST})"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
       - "traefik.http.routers.traefik.entrypoints=https"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -180,46 +179,6 @@ services:
           memory: 400M
 
   # ============================================
-  # ELASTICSEARCH
-  # ============================================
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
-    container_name: elasticsearch
-    restart: unless-stopped
-    networks:
-      - internal
-      - monitoring
-    ports:
-      - "${ELASTIC_PORT}:9200"
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-      - xpack.security.enabled=true
-      - xpack.security.http.ssl.enabled=false
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    healthcheck:
-      test: ["CMD-SHELL", "curl -u elastic:${ELASTIC_PASSWORD} -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 3G
-        reservations:
-          memory: 2G
-
-  # ============================================
   # MONITORING - PROMETHEUS
   # ============================================
   prometheus:
@@ -240,7 +199,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(${PROMETHEUS_HOST})"
+      - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_HOST}`)"
       - "traefik.http.routers.prometheus.entrypoints=https"
       - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
       - "traefik.http.routers.prometheus.middlewares=auth"
@@ -345,7 +304,7 @@ services:
       - uptime-kuma-data:/app/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.uptime.rule=Host(${UPTIME_HOST})"
+      - "traefik.http.routers.uptime.rule=Host(`${UPTIME_HOST}`)"
       - "traefik.http.routers.uptime.entrypoints=https"
       - "traefik.http.routers.uptime.tls.certresolver=letsencrypt"
       - "traefik.http.services.uptime.loadbalancer.server.port=${UPTIME_PORT}"
