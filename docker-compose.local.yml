@@ -148,10 +148,11 @@ services:
     environment:
       - N8N_HOST=${N8N_HOST}
       - N8N_PROTOCOL=http
-      - N8N_PORT=${N8N_PORT}
       - NODE_ENV=production
-      - WEBHOOK_URL=https://${N8N_HOST}/
+      - WEBHOOK_URL=http://${N8N_HOST}/
       - GENERIC_TIMEZONE=Europe/Paris
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_RUNNERS_ENABLED=true
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=${POSTGRES_HOST}
       - DB_POSTGRESDB_PORT=${POSTGRES_PORT}
