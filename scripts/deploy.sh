@@ -8,7 +8,6 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-
 # Charger les variables du fichier .env
 export $(grep -v '^#' .env | xargs)
 set -a
@@ -23,7 +22,7 @@ docker compose down
 echo "📥 Téléchargement des images..."
 docker compose pull
 
-# Démarrage
+# Démarrage des services
 echo "▶️  Démarrage des services..."
 docker compose up -d
 
@@ -31,6 +30,7 @@ echo "✨ Déploiement terminé!"
 echo "📋 Services accessibles:"
 echo "  - Traefik: https://$TRAEFIK_HOST"
 echo "  - Portainer: https://$PORTAINER_HOST"
+echo "  - PGAdmin: https://$PGADMIN_HOST"
 echo "  - Grafana: https://$GRAFANA_HOST"
 echo "  - Prometheus: https://$PROMETHEUS_HOST"
 echo "  - Uptime Kuma: https://$UPTIME_HOST"
