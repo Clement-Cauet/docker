@@ -41,6 +41,7 @@ services:
       - TZ=Europe/Paris
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -147,12 +148,14 @@ services:
       - n8n-data:/home/node/.n8n
     environment:
       - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=${N8N_PORT}
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      - WEBHOOK_URL=http://${N8N_HOST}/
+      - WEBHOOK_URL=http://${N8N_HOST}
       - GENERIC_TIMEZONE=Europe/Paris
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_RUNNERS_ENABLED=true
+      - N8N_SECURE_COOKIE=false
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=${POSTGRES_HOST}
       - DB_POSTGRESDB_PORT=${POSTGRES_PORT}
@@ -162,6 +165,7 @@ services:
       - N8N_METRICS=true
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.n8n.rule=Host(`${N8N_HOST}`)"
       - "traefik.http.routers.n8n.entrypoints=web"
       - "traefik.http.services.n8n.loadbalancer.server.port=${N8N_PORT}"
@@ -198,6 +202,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_HOST}`)"
       - "traefik.http.routers.prometheus.entrypoints=web"
       - "traefik.http.services.prometheus.loadbalancer.server.port=${PROMETHEUS_PORT}"
@@ -272,6 +277,7 @@ services:
       - GF_INSTALL_PLUGINS=redis-datasource
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST}`)"
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}"
@@ -300,6 +306,7 @@ services:
       - uptime-kuma-data:/app/data
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.uptime.rule=Host(`${UPTIME_HOST}`)"
       - "traefik.http.routers.uptime.entrypoints=web"
       - "traefik.http.services.uptime.loadbalancer.server.port=${UPTIME_PORT}"
@@ -326,6 +333,7 @@ services:
       - portainer-data:/data
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST}`)"
       - "traefik.http.routers.portainer.entrypoints=web"
       - "traefik.http.services.portainer.loadbalancer.server.port=${PORTAINER_PORT}"
@@ -348,6 +356,7 @@ services:
     command: sleep infinity
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=docker-services_web"
       - "traefik.http.routers.teepee-proxy.rule=Host(`${TEEPEE_PROXY_HOST}`)"
       - "traefik.http.routers.teepee-proxy.entrypoints=web"
       - "traefik.http.routers.teepee-proxy.middlewares=teepee-headers"
