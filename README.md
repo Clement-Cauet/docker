@@ -102,13 +102,13 @@ Affiche l’état des containers.
 1) Se connecter à PGAdmin avec les identifiants du ``.env``
 
 2) Ajouter le serveur PostgreSQL
-- Clic droit sur Servers → Register → Server
-- Onglet General :
-- Name : Docker PostgreSQL
-- Onglet Connection :
-- Host name/address : POSTGRES_HOST
-- Port : POSTGRES_PORT
-- Maintenance database : postgres
-- Username : POSTGRES_USER
-- Password : POSTGRES_PASSWORD
-- Cocher Save password
+    - Clic droit sur Servers → Register → Server
+    - Onglet General :
+        - Name : Docker PostgreSQL
+    - Onglet Connection :
+        - Host name/address : POSTGRES_HOST
+        - Port : POSTGRES_PORT
+        - Maintenance database : postgres
+        - Username : POSTGRES_USER
+        - Password : POSTGRES_PASSWORD
+        - Cocher Save password
